@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader, random_split
 from tqdm import tqdm
 
 from data.Pix3dDataset import Pix3dDataset
-from model.ImageGridEncoder import ImageGridEncoder
+from model.MindsEye import MindsEye
 from utils.data_utils import save_checkpoint
 
 def parse_command_line_arguments():
@@ -17,8 +17,8 @@ def parse_command_line_arguments():
     parser.add_argument('--evaluate', '-e', action="store_true",
                         help='Only run evaluation')
 
-    parser.add_argument('--batch_size', type=int, default=2,
-                        help='mini-batch size (default: 2)')
+    parser.add_argument('--batch_size', type=int, default=1,
+                        help='mini-batch size (default: 1)')
 
     parser.add_argument('--epochs', type=int, default=2,
                         help='number of training epochs (default: 2)')
@@ -41,7 +41,7 @@ def parse_command_line_arguments():
     parser.add_argument('--resume_from_epoch', type=int, default=None,
                         help='Resume from checkpoint @ specified epoch number')
 
-    parser.add_argument('--data_dir', type=str, default="./data/pix3d_full", 
+    parser.add_argument('--data_dir', type=str, default="./data/pix3d", 
                         help="Folder where the pix3d dataset and generated grid images are stored")
 
     parser.add_argument('--train_split', type=float, default=0.85,
@@ -56,8 +56,8 @@ def evaluate(model, criterion, dataloader, device='cuda'):
     with torch.no_grad():
         total_loss = 0.0
         for batch in tqdm(dataloader):
-            inputs = batch.input_vec
-            targets = batch.output_vec
+            inputs = batch[0]
+            targets = batch[1][0]
             inputs = inputs.to(device)
             targets = targets.to(device)
 
@@ -74,8 +74,8 @@ def train(model, criterion, optimizer, train_dataloader, validation_dataloader, 
         for batch in tqdm(train_dataloader):
             optimizer.zero_grad()
 
-            inputs = batch.input_vec
-            targets = batch.output_vec
+            inputs = batch[0]
+            targets = batch[1][0]
             inputs = inputs.to(device)
             targets = targets.to(device)
 
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     set_seed(args.seed)
     save_path_prefix = "results"
     
-    model = torch.load(f'{save_path_prefix}/checkpoints/checkpoint-{args.resume_from_epoch}.pth', map_location=lambda storage, location: storage) if args.resume_from_epoch else ImageGridEncoder()
+    model = torch.load(f'{save_path_prefix}/checkpoints/checkpoint-{args.resume_from_epoch}.pth', map_location=lambda storage, location: storage) if args.resume_from_epoch else MindsEye()
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.wd)
     criterion = nn.L1Loss()
 
