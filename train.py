@@ -1,10 +1,12 @@
 import argparse
-import tqdm
 import torch
-from torch import nn
 
 from transformers import set_seed
+from torch import nn
+from torch.utils.data import DataLoader, random_split
+from tqdm import tqdm
 
+from data.Pix3dDataset import Pix3dDataset
 from model.ImageGridEncoder import ImageGridEncoder
 from utils.data_utils import save_checkpoint
 
@@ -37,7 +39,13 @@ def parse_command_line_arguments():
                         help='Seed for random initialization (default: 42)')
     
     parser.add_argument('--resume_from_epoch', type=int, default=None,
-                help='Resume from checkpoint @ specified epoch number')
+                        help='Resume from checkpoint @ specified epoch number')
+
+    parser.add_argument('--data_dir', type=str, default="./data/pix3d_full", 
+                        help="Folder where the pix3d dataset and generated grid images are stored")
+
+    parser.add_argument('--train_split', type=float, default=0.85,
+                        help="Determines train/test split. Between [0.0, 1.0], default: 0.85")
     
     parsed_arguments = parser.parse_args()
     return parsed_arguments
@@ -108,32 +116,27 @@ if __name__ == '__main__':
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.wd)
     criterion = nn.L1Loss()
 
-    # TODO: Solve dataloading
-    dataset = None
-    train_set = dataset.get('train')
-    validation_set = dataset.get('validation')
-    test_set = dataset.get('test')
+    dataset = Pix3dDataset(data_dir=args.data_dir)
+    train_dataset, validation_dataset = random_split(dataset, [args.train_split, 1.0 - args.train_split])
 
-    # TODO: Solve dataloader
-    train_dataloader = train_set
-    validation_dataloader = validation_set
-    test_dataloader = test_set
+    train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
+    validation_dataloader = DataLoader(validation_dataset, batch_size=args.batch_size, shuffle=True)
+    print(f"Dataloaders ready. Train set length: {len(train_dataloader)}, Validation set length: {len(validation_dataloader)}")
 
     if not args.evaluate:
         train(
                 model=model,
                 criterion=criterion,
                 optimizer=optimizer,
-                train_set=train_set,
-                validation_set=validation_set,
+                train_dataloader=train_dataloader,
+                validation_dataloader=validation_dataloader,
                 num_epochs=args.epochs,
                 device=args.device,
-                batch_size=args.batch_size,
                 starting_epoch=args.resume_from_epoch if args.resume_from_epoch else 0,
                 save_path_prefix=save_path_prefix,
             )
 
-    test_loss = evaluate(model, criterion, test_dataloader, args.device)
+    test_loss = evaluate(model, criterion, validation_dataloader, args.device)
     print(f"\t Test Loss = {test_loss:.4f}")
     with open(f"{save_path_prefix}/metrics.csv", "a") as results_file:
         results_file.write(f"test,-1,{test_loss:.4f}\n")
