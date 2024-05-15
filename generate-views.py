@@ -24,6 +24,8 @@ class ConvDino(nn.Module):
         self.dropout_2 = nn.Dropout(0.5)
         self.dropout_3 = nn.Dropout(0.2)
 
+        self.flat = nn.Flatten()
+
         self.fc_1 = nn.Linear(1800000, 1800)
         self.fc_2 = nn.Linear(1800, 1024)
 
@@ -46,6 +48,7 @@ class ConvDino(nn.Module):
        # 20*600*600 to 20*300*300
        x = self.maxpool_1(x)
        # 20*300*300 to 1800000
+       x = self.flat(x)
        x = self.relu(self.fc_1(x))
        x = self.dropout_3(x)
        x = self.fc_2(x)
