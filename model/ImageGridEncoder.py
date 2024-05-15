@@ -5,7 +5,7 @@ from transformers import AutoModel, AutoProcessor
 class ImageGridEncoder(nn.Module):
 
     def __init__(self):
-        super.__init__()
+        super(ImageGridEncoder, self).__init__()
         self.conv2d_1 = nn.Conv2d(in_channels=3, out_channels=10, kernel_size=5, padding=1, bias=True)
         self.conv2d_2 = nn.Conv2d(in_channels=10, out_channels=20, kernel_size=5, padding=1, bias=True)
 
