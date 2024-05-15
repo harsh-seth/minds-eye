@@ -1,15 +1,8 @@
-# Given a 3D model, create an image of the object at a specified rotation and translation (distance) from the object
-def modelToView(model, rotation=0.0, translation=0.0):
-  pass
-
-
 import torch
 import torch.nn as nn
-import torch.optim as optimizer
-import torchvision
 from transformers import AutoModel, AutoProcessor
 
-class ConvDino(nn.Module):
+class ImageGridEncoder(nn.Module):
 
     def __init__(self):
         super.__init__()
