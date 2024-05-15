@@ -19,8 +19,8 @@ class ImageGridEncoder(nn.Module):
 
         self.flat = nn.Flatten()
 
-        self.fc_1 = nn.Linear(1800000, 1800)
-        self.fc_2 = nn.Linear(1800, 1024)
+        self.fc_1 = nn.Linear(20480, 10240)
+        self.fc_2 = nn.Linear(10240, 1024)
 
         self.dino_processor = AutoProcessor.from_pretrained("facebook/dinov2-base")
         self.dino_model = AutoModel.from_pretrained("facebook/dinov2-base")
@@ -32,15 +32,15 @@ class ImageGridEncoder(nn.Module):
 
 
     def forward(self, x):
-       # 3x600x600
+       # 3x64x64
        x = self.relu(self.conv2d_1(x))
        x = self.dropout_1(x)
-       # 10*600*600 to 20*600*600
+       # 10*64*64 to 20*64*64
        x = self.relu(self.conv2d_2(x))
        x = self.dropout_2(x)
-       # 20*600*600 to 20*300*300
+       # 20*64*64 to 20*32*32
        x = self.maxpool_1(x)
-       # 20*300*300 to 1800000
+       # 20*32*32 to 20480
        x = self.flat(x)
        x = self.relu(self.fc_1(x))
        x = self.dropout_3(x)
