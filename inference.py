@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 from PIL import Image
 
 # Given an image grid of views of a subject, generate a corresponding 3D model of the subject
-def generate3DModelFromImageGrid(image, vertices_model, triangles_model):
+def generate3DModelFromImageGrid(image, vertices_model, triangles_model, max_vertices=5000):
     vertices_model.eval()
     triangles_model.eval()
 
@@ -22,6 +22,8 @@ def generate3DModelFromImageGrid(image, vertices_model, triangles_model):
     with torch.no_grad():
         vertices = vertices_model(image)[0]
         triangles = triangles_model(image)[0]
+
+    triangles = torch.floor(triangles * max_vertices)
 
     mesh = o3d.geometry.TriangleMesh()
     mesh.vertices = o3d.utility.Vector3dVector(vertices.numpy().astype(np.float64))
@@ -44,6 +46,9 @@ def parse_command_line_arguments():
     
     parser.add_argument('--results_dir', type=str, default="results",
                         help='Path to the results folder')
+    
+    parser.add_argument('--max_vertices', type=int, default=5000,
+                        help='Needs to be the same number as used during training')
 
     parsed_arguments = parser.parse_args()
     return parsed_arguments
@@ -54,4 +59,4 @@ if __name__ == '__main__':
     triangle_model = torch.load(f'{args.results_dir}/triangles/checkpoints/checkpoint-{args.triangles_checkpoint}.pth', map_location=lambda storage, location: storage)
 
     img = Image.open(args.image_path)
-    generate3DModelFromImageGrid(image=img, vertices_model=vertices_model, triangles_model=triangle_model)
+    generate3DModelFromImageGrid(image=img, vertices_model=vertices_model, triangles_model=triangle_model, max_vertices=args.max_vertices)

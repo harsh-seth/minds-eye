@@ -4,7 +4,7 @@ from model.ImageGridEncoder import ImageGridEncoder
 from model.MeshDecoder import MeshDecoder
 
 class MindsEye(nn.Module):
-    def __init__(self, generate_triangles=False, num_vertices=4000, num_triangles=750):
+    def __init__(self, generate_triangles=False, num_vertices=5000, num_triangles=5000):
         super().__init__()
 
         self.imageGridEncoder = ImageGridEncoder()

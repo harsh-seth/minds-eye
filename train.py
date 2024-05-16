@@ -50,11 +50,11 @@ def parse_command_line_arguments():
     parser.add_argument('--max_records', type=int, default=None,
                         help="Determines the max number of records to a build dataset on, default: all records")
 
-    parser.add_argument('--max_vertices', type=int, default=4000,
-                    help="Determines the max number of vertices to allow in a single mesh, default: 4000")
+    parser.add_argument('--max_vertices', type=int, default=5000,
+                    help="Determines the max number of vertices to allow in a single mesh, default: 5000")
 
-    parser.add_argument('--max_triangles', type=int, default=750,
-                    help="Determines the max number of triangles to allow in a single mesh, default: 750")
+    parser.add_argument('--max_triangles', type=int, default=5000,
+                    help="Determines the max number of triangles to allow in a single mesh, default: 5000")
     
     parsed_arguments = parser.parse_args()
     return parsed_arguments

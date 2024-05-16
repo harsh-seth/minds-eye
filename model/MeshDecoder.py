@@ -4,7 +4,7 @@ from einops import rearrange
 
 class MeshDecoder(nn.Module):
 
-    def __init__(self, embedding_dim=512, generate_triangles=False, num_vertices=3000, num_triangles=750):
+    def __init__(self, embedding_dim=512, generate_triangles=False, num_vertices=5000, num_triangles=5000):
         super().__init__()
         self.generate_triangles = generate_triangles
         self.num_vertices=num_vertices
@@ -41,12 +41,8 @@ class MeshDecoder(nn.Module):
        # (N, 1, 1 num_vertices) / (N, 1, 1, num_triangles)
        x = self.sig(self.convTranspose1(x))
        # (N, 3, 1 num_vertices) / (N, 3, 1, num_triangles)
-       # Scale values to become valid entries
-       if self.generate_triangles:
-           x = torch.floor(x*self.num_vertices)
-       else:
+       if not self.generate_triangles:
            x = x*2 - 1
-        # (N, num_vertices) / (N, num_triangles)
        x = rearrange(x, 'N c 1 d -> N d c')
        # (N, 3, num_vertices) / (N, 3, num_triangles)
        return x
