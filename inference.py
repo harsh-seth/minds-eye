@@ -6,8 +6,6 @@ import torchvision.transforms as transforms
 
 from PIL import Image
 
-from model.MindsEye import MindsEye
-
 # Given an image grid of views of a subject, generate a corresponding 3D model of the subject
 def generate3DModelFromImageGrid(image, vertices_model, triangles_model):
     vertices_model.eval()
@@ -19,11 +17,11 @@ def generate3DModelFromImageGrid(image, vertices_model, triangles_model):
             transforms.Normalize([0.5], [0.5]),
     ])
 
-    image = image_transform(image)
+    image = image_transform(image).unsqueeze(0) # creating a batch of size 1
 
     with torch.no_grad():
-        vertices = vertices_model(image)
-        triangles = triangles_model(image)
+        vertices = vertices_model(image)[0]
+        triangles = triangles_model(image)[0]
 
     mesh = o3d.geometry.TriangleMesh()
     mesh.vertices = o3d.utility.Vector3dVector(vertices.numpy().astype(np.float64))
@@ -52,7 +50,7 @@ def parse_command_line_arguments():
 
 if __name__ == '__main__':
     args = parse_command_line_arguments()
-    vertices_model = torch.load(f'{args.results_dir}/vertices/checkpoints/checkpoint-{args.vertex_checkpoint}.pth', map_location=lambda storage, location: storage)
+    vertices_model = torch.load(f'{args.results_dir}/vertices/checkpoints/checkpoint-{args.vertices_checkpoint}.pth', map_location=lambda storage, location: storage)
     triangle_model = torch.load(f'{args.results_dir}/triangles/checkpoints/checkpoint-{args.triangles_checkpoint}.pth', map_location=lambda storage, location: storage)
 
     img = Image.open(args.image_path)
