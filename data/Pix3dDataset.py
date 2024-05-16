@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 class Pix3dDataset(Dataset):
 
-    def __init__(self, objects = ['bookcase', 'desk', 'chair'], data_dir="./pix3d", max_records=None, max_vertices=4000, max_triangles=750) -> None:
+    def __init__(self, objects = ['bookcase', 'desk'], data_dir="./pix3d", max_records=None, max_vertices=5000, max_triangles=5000) -> None:
         super().__init__()
         self.max_vertices=max_vertices
         self.max_triangles=max_triangles
@@ -46,12 +46,14 @@ class Pix3dDataset(Dataset):
         pointcloud_data = pointcloud_data.compute_vertex_normals()
         
         vertices = np.asarray(pointcloud_data.vertices)
+        triangles = np.asarray(pointcloud_data.triangles)
+        triangles = triangles/self.max_vertices # normalizing triangle value. IMP: Need to denorm with same max_vertices value at inference time
+
         while vertices.shape[0] < self.max_vertices: # padding with repeats
             difference = self.max_vertices - vertices.shape[0]
             vertices = np.vstack([vertices, vertices[:difference]])
         vertices = vertices[:self.max_vertices]
         
-        triangles = np.asarray(pointcloud_data.triangles)
         while triangles.shape[0] < self.max_triangles: # padding with repeats
             difference = self.max_triangles - triangles.shape[0]
             triangles = np.vstack([triangles, triangles[:difference]])
@@ -59,7 +61,7 @@ class Pix3dDataset(Dataset):
         
         pointcloud_data = [
             torch.tensor(vertices, dtype=torch.float32), 
-            torch.tensor(triangles, dtype=torch.int64)
+            torch.tensor(triangles, dtype=torch.float32)
         ]
         
         img = Image.open(self.records[idx][0])

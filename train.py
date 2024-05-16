@@ -50,11 +50,11 @@ def parse_command_line_arguments():
     parser.add_argument('--max_records', type=int, default=None,
                         help="Determines the max number of records to a build dataset on, default: all records")
 
-    parser.add_argument('--max_vertices', type=int, default=4000,
-                    help="Determines the max number of vertices to allow in a single mesh, default: 4000")
+    parser.add_argument('--max_vertices', type=int, default=5000,
+                    help="Determines the max number of vertices to allow in a single mesh, default: 5000")
 
-    parser.add_argument('--max_triangles', type=int, default=750,
-                    help="Determines the max number of triangles to allow in a single mesh, default: 750")
+    parser.add_argument('--max_triangles', type=int, default=5000,
+                    help="Determines the max number of triangles to allow in a single mesh, default: 5000")
     
     parsed_arguments = parser.parse_args()
     return parsed_arguments
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     print(f"Dataloaders ready. Train set length: {len(train_dataloader)}, Validation set length: {len(validation_dataloader)}")
 
     model = torch.load(f'{save_path_prefix}/checkpoints/checkpoint-{args.from_checkpoint}.pth', map_location=lambda storage, location: storage) if args.from_checkpoint else MindsEye(generate_triangles=args.triangles, num_vertices=args.max_vertices, num_triangles=args.max_triangles)
-    criterion = nn.L1Loss()
+    criterion = nn.MSELoss() if args.triangles else nn.L1Loss()
     if args.evaluate:
         test_loss = evaluateOnce(model, criterion, validation_dataloader, args.device, generate_triangles=args.triangles)
         print(f"\t Test Loss = {test_loss:.4f}")
