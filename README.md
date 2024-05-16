@@ -69,7 +69,7 @@ setup.sh
     </p>
 
 ## Contributors:
-- Aditya Patil - <aditya.patil@umass.edu>
+- Aditya Patil - <adityapatil@umass.edu>
 - Adwait Bhope - <abhope@umass.edu>
 - Dhrumeen Patel - <dhrumeenkish@umass.edu>
 - Harsh Seth - <hseth@umass.edu>

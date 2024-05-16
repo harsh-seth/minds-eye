@@ -23,7 +23,7 @@ def generate3DModelFromImageGrid(image, vertices_model, triangles_model, max_ver
         vertices = vertices_model(image)[0]
         triangles = triangles_model(image)[0]
 
-    triangles = torch.floor(triangles * max_vertices)
+    triangles = (triangles * max_vertices).int()
 
     mesh = o3d.geometry.TriangleMesh()
     mesh.vertices = o3d.utility.Vector3dVector(vertices.numpy().astype(np.float64))

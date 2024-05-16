@@ -61,7 +61,7 @@ class Pix3dDataset(Dataset):
         
         pointcloud_data = [
             torch.tensor(vertices, dtype=torch.float32), 
-            torch.tensor(triangles, dtype=torch.int64)
+            torch.tensor(triangles, dtype=torch.float32)
         ]
         
         img = Image.open(self.records[idx][0])

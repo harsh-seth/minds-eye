@@ -132,7 +132,7 @@ if __name__ == '__main__':
     print(f"Dataloaders ready. Train set length: {len(train_dataloader)}, Validation set length: {len(validation_dataloader)}")
 
     model = torch.load(f'{save_path_prefix}/checkpoints/checkpoint-{args.from_checkpoint}.pth', map_location=lambda storage, location: storage) if args.from_checkpoint else MindsEye(generate_triangles=args.triangles, num_vertices=args.max_vertices, num_triangles=args.max_triangles)
-    criterion = nn.L1Loss()
+    criterion = nn.MSELoss() if args.triangles else nn.L1Loss()
     if args.evaluate:
         test_loss = evaluateOnce(model, criterion, validation_dataloader, args.device, generate_triangles=args.triangles)
         print(f"\t Test Loss = {test_loss:.4f}")
