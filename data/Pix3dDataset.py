@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 class Pix3dDataset(Dataset):
 
-    def __init__(self, objects = ['bookcase', 'desk'], data_dir="./pix3d", max_records=None, max_vertices=4000, max_triangles=750) -> None:
+    def __init__(self, objects = ['bookcase', 'desk', 'chair'], data_dir="./pix3d", max_records=None, max_vertices=4000, max_triangles=750) -> None:
         super().__init__()
         self.max_vertices=max_vertices
         self.max_triangles=max_triangles
