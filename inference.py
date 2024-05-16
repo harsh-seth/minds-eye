@@ -2,6 +2,7 @@ import argparse
 import numpy as np
 import open3d as o3d
 import torch
+import torchvision.transforms as transforms
 
 from PIL import Image
 
@@ -11,6 +12,14 @@ from model.MindsEye import MindsEye
 def generate3DModelFromImageGrid(image, vertices_model, triangles_model):
     vertices_model.eval()
     triangles_model.eval()
+
+    image_transform = transforms.Compose([
+            transforms.Resize(64),
+            transforms.ToTensor(),
+            transforms.Normalize([0.5], [0.5]),
+    ])
+
+    image = image_transform(image)
 
     with torch.no_grad():
         vertices = vertices_model(image)
