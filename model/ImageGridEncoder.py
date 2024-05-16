@@ -38,7 +38,7 @@ class ImageGridEncoder(nn.Module):
             nn.Linear(int(embedding_dim * mlp_ratio), embedding_dim),
         )
 
-        self.positional_embeddings = nn.Parameter(torch.randn(embedding_dim)).unsqueeze(0).to(device)  # Learnable positional embeddings
+        self.positional_embeddings = nn.Parameter(torch.randn(embedding_dim))  # Learnable positional embeddings
 
     def forward(self, x):
        # (N, 3, 64, 64)
@@ -64,6 +64,7 @@ class ImageGridEncoder(nn.Module):
        x = x + self.mlp2(self.norm2(x))
        # (N, 512)
        # Combining image features with learnable position features with cross-attention (query: pos; key, val: img)
-       x = self.positional_embeddings + self.pos_attn(self.norm3(self.positional_embeddings), x, x, need_weights=False)[0]
+       # x = self.positional_embeddings + self.pos_attn(self.norm3(self.positional_embeddings), x, x, need_weights=False)[0] # Need to give positional_embeddings the dimension!
+       x = self.positional_embeddings + x
        # (N, 512)
        return x
