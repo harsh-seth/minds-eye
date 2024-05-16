@@ -37,11 +37,14 @@ class MeshDecoder(nn.Module):
        x = self.lin1(x)
        # (N, num_vertices) / (N, num_triangles)
        # Generating 3D features in 3 channels
-       x = x.unsqueeze(1)
+       x = x.unsqueeze(1).unsqueeze(1) # required to allow ConvTranspose operation
+       # (N, 1, 1 num_vertices) / (N, 1, 1, num_triangles)
        x = self.sig(self.convTranspose1(x))
+       # (N, 3, 1 num_vertices) / (N, 3, 1, num_triangles)
        # Scale values to give valid vertices if generating triangles
        if self.generate_triangles:
            x = torch.floor(x*self.num_vertices)
            # (N, num_vertices) / (N, num_triangles)
-       x = rearrange(x, 'N c d -> N d c')
+       x = rearrange(x, 'N c 1 d -> N d c')
+       # (N, 3, num_vertices) / (N, 3, num_triangles)
        return x

@@ -20,8 +20,8 @@ def parse_command_line_arguments():
     parser.add_argument('--triangles', action="store_true",
                         help='Pass to run scripts for Triangles instead of Vertices')
 
-    parser.add_argument('--batch_size', type=int, default=1,
-                        help='mini-batch size (default: 1)')
+    parser.add_argument('--batch_size', type=int, default=16,
+                        help='mini-batch size (default: 16)')
 
     parser.add_argument('--epochs', type=int, default=100,
                         help='number of training epochs (default: 100)')
