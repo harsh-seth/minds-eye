@@ -107,6 +107,7 @@ for item in data:
     
     if viewer.do:
         image_dir = os.path.join(folder_dir, 'images')
+        # Uncomment below line to generate a 9x9 grid
         # grid_path = os.path.join(image_dir, f"{object_name}_grid.png")
         grid_path = os.path.join('data/grids4/', f"{object_name}_4x4grid.png")
 
