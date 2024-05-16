@@ -64,7 +64,6 @@ class ImageGridEncoder(nn.Module):
        x = x + self.mlp2(self.norm2(x))
        # (N, 512)
        # Combining image features with learnable position features with cross-attention (query: pos; key, val: img)
-       # x = self.positional_embeddings + self.pos_attn(self.norm3(self.positional_embeddings), x, x, need_weights=False)[0] # Need to give positional_embeddings the dimension!
-       x = self.positional_embeddings + x
+       x = self.positional_embeddings + self.pos_attn(self.norm3(self.positional_embeddings).tile((x.shape[0], 1)), x, x, need_weights=False)[0]
        # (N, 512)
        return x
